@@ -110,13 +110,12 @@ function toggleConnect() {
   const pw = PW.value.trim();
   if (!pw) { log('Enter password', 'err'); return; }
 
-  const url = prompt('Render URL (e.g. botrat.onrender.com):', '');
-
+  let url = prompt('Render URL (e.g. botrat.onrender.com):', '');
   if (!url) return;
+  url = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
   URL_LABEL.textContent = url;
 
-  const proto = 'wss://';
-  const wsUrl = proto + url + '/admin/ws';
+  const wsUrl = 'wss://' + url + '/admin/ws';
 
   setStatus('Connecting...');
   log('Connecting to ' + wsUrl + ' ...', 'sys');
