@@ -2,52 +2,229 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BotRat Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#120a1e">
+<title>BotRat Synthwave</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #120a1e;
+  --bg2: #1a0f2e;
+  --bg3: #261542;
+  --purple: #7b2d8e;
+  --pink: #ff2d95;
+  --cyan: #00f0ff;
+  --yellow: #ffe600;
+  --yellow-dim: #b89e00;
+  --text: #e0d0ff;
+  --text-dim: #8870b0;
+  --glow-cyan: 0 0 15px rgba(0,240,255,.3);
+  --glow-yellow: 0 0 15px rgba(255,230,0,.3);
+  --glow-pink: 0 0 15px rgba(255,45,149,.3);
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1a1a2e;color:#eee;font:14px/1.4 'SF Mono','Cascadia Code','Consolas',monospace;padding:16px;height:100vh;display:flex;flex-direction:column}
-#top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid #333}
-#status{font-size:13px;padding:4px 12px;border-radius:4px;background:#333}
-#status.ok{background:#1b5e20}
-#status.err{background:#b71c1c}
-#pw{background:#16213e;border:1px solid #333;color:#eee;padding:6px 10px;border-radius:4px;font:13px monospace;width:200px}
-#pw:focus{outline:none;border-color:#0f3460}
-#connect{background:#0f3460;color:#eee;border:none;padding:6px 16px;border-radius:4px;cursor:pointer}
-#connect:hover{background:#1a4f8a}
-#cl-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 0;min-height:36px}
-.cl-btn{background:#16213e;border:1px solid #333;color:#aaa;padding:4px 10px;border-radius:4px;cursor:pointer;font:12px monospace}
-.cl-btn:hover{border-color:#0f3460;color:#eee}
-.cl-btn.cur{background:#0f3460;border-color:#0f3460;color:#fff}
-#term{flex:1;background:#0d0d1a;border:1px solid #222;border-radius:4px;padding:12px;overflow-y:auto;font:14px/1.5 'SF Mono','Cascadia Code','Consolas',monospace;white-space:pre-wrap;word-break:break-all;margin:8px 0}
-#term .prompt{color:#0f0}
-#term .out{color:#ccc}
-#term .err{color:#f55}
-#term .sys{color:#888;font-style:italic}
-#input-line{display:flex;gap:8px;align-items:center;padding-top:8px;border-top:1px solid #333}
-#prompt{color:#0f0}
-#cmd{flex:1;background:#16213e;border:1px solid #333;color:#eee;padding:8px 10px;border-radius:4px;font:14px monospace}
-#cmd:focus{outline:none;border-color:#0f3460}
-#cmd:disabled{opacity:.4}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 'JetBrains Mono', monospace;
+  padding: env(safe-area-inset-top, 12px) 12px env(safe-area-inset-bottom, 12px);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-image:
+    linear-gradient(0deg, transparent 24%, rgba(255,45,149,.03) 25%, rgba(255,45,149,.03) 26%, transparent 27%, transparent 74%, rgba(255,45,149,.03) 75%, rgba(255,45,149,.03) 76%, transparent 77%),
+    linear-gradient(90deg, transparent 24%, rgba(0,240,255,.03) 25%, rgba(0,240,255,.03) 26%, transparent 27%, transparent 74%, rgba(0,240,255,.03) 75%, rgba(0,240,255,.03) 76%, transparent 77%);
+  background-size: 40px 40px;
+}
+
+/* scanlines */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.15) 2px, rgba(0,0,0,.15) 4px);
+  pointer-events: none;
+  z-index: 999;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--purple);
+  flex-shrink: 0;
+  position: relative;
+}
+
+#header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--yellow), var(--pink), var(--cyan), transparent);
+}
+
+#logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 18px;
+  background: linear-gradient(135deg, var(--pink), var(--yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+  text-shadow: none;
+}
+
+#status {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--purple);
+  color: var(--text-dim);
+  margin-left: auto;
+  white-space: nowrap;
+}
+#status.ok{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan)}
+#status.err{background:rgba(255,45,149,.1);border-color:var(--pink);color:var(--pink)}
+
+#auth-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+#pw {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg2);
+  border: 1px solid var(--purple);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font: 13px 'JetBrains Mono', monospace;
+}
+#pw:focus{outline:none;border-color:var(--cyan);box-shadow:var(--glow-cyan)}
+#connect {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font: 13px 'JetBrains Mono', monospace;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+#connect:hover{box-shadow:var(--glow-pink)}
+#connect.dc{background:var(--bg3);border:1px solid var(--pink);color:var(--pink)}
+
+#cl-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  flex-shrink: 0;
+  min-height: 34px;
+}
+.cl-btn {
+  background: var(--bg2);
+  border: 1px solid var(--purple);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: 11px 'JetBrains Mono', monospace;
+  transition: all .15s;
+}
+.cl-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.cl-btn.cur{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan);box-shadow:var(--glow-cyan)}
+
+#term {
+  flex: 1;
+  min-height: 80px;
+  background: rgba(18,10,30,.85);
+  border: 1px solid var(--bg3);
+  border-radius: 6px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  font: 13px/1.6 'JetBrains Mono', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 6px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple) transparent;
+}
+#term::-webkit-scrollbar{width:4px}
+#term::-webkit-scrollbar-track{background:transparent}
+#term::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px}
+
+#term .prompt { color: var(--yellow); text-shadow: 0 0 8px rgba(255,230,0,.3); }
+#term .out    { color: var(--text); }
+#term .err    { color: var(--pink); }
+#term .sys    { color: var(--cyan); font-style: italic; text-shadow: 0 0 6px rgba(0,240,255,.2); }
+#term .highlight { color: var(--yellow); }
+
+#input-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  flex-shrink: 0;
+  border-top: 1px solid var(--bg3);
+}
+#prompt {
+  color: var(--yellow);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255,230,0,.4);
+  flex-shrink: 0;
+}
+#cmd {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font: 14px 'JetBrains Mono', monospace;
+}
+#cmd:focus{outline:none;border-color:var(--yellow);box-shadow:var(--glow-yellow)}
+#cmd:disabled{opacity:.3}
+
 .hide{display:none!important}
 </style>
 </head>
 <body>
 
-<div id="top">
-  <span id="status">Disconnected</span>
-  <input id="pw" type="password" placeholder="Admin password">
-  <button id="connect">Connect</button>
-  <span style="color:#555;font-size:12px;margin-left:8px" id="url-label"></span>
+<div id="header">
+  <span id="logo">BOTRAT</span>
+  <span id="status">◉ disconnected</span>
 </div>
 
-<div id="cl-bar"><span style="color:#555;font-size:12px">Clients:</span></div>
+<div id="auth-line">
+  <input id="pw" type="password" placeholder="password">
+  <button id="connect">connect</button>
+</div>
 
-<div id="term">Welcome to BotRat Admin.<br>Enter password and connect.<br></div>
+<div id="cl-bar"><span style="color:var(--text-dim);font-size:11px">no clients</span></div>
+
+<div id="term"><span class="sys">λ synthwave terminal v1.0<br>λ enter password &amp; connect</span></div>
 
 <div id="input-line" class="hide">
-  <span id="prompt">$</span>
-  <input id="cmd" type="text" placeholder="type command..." disabled autofocus>
+  <span id="prompt">▶</span>
+  <input id="cmd" type="text" placeholder="command..." disabled autofocus>
 </div>
 
 <script>
@@ -58,151 +235,113 @@ const CONN = document.getElementById('connect');
 const STATUS = document.getElementById('status');
 const CL_BAR = document.getElementById('cl-bar');
 const INPUT_LINE = document.getElementById('input-line');
-const URL_LABEL = document.getElementById('url-label');
 
 let ws = null;
 let connected = false;
 let clients = {};
 
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
 function log(text, cls='out') {
-  TERM.innerHTML += `<span class="${cls}">${escapeHtml(text)}\n</span>`;
+  TERM.innerHTML += `<span class="${cls}">${esc(text)}\n</span>`;
   TERM.scrollTop = TERM.scrollHeight;
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
 function setStatus(text, cls='') {
-  STATUS.textContent = text;
+  STATUS.textContent = '◉ ' + text;
   STATUS.className = cls;
 }
 
 function renderClients() {
-  let html = '<span style="color:#555;font-size:12px">Clients:</span>';
-  for (const [id, c] of Object.entries(clients)) {
+  const ids = Object.keys(clients);
+  if (!ids.length) {
+    CL_BAR.innerHTML = '<span style="color:var(--text-dim);font-size:11px">no clients</span>';
+    return;
+  }
+  let html = '';
+  ids.forEach(id => {
+    const c = clients[id];
     const cls = c.current ? 'cl-btn cur' : 'cl-btn';
     html += `<button class="${cls}" data-id="${id}">${id}:${c.addr}</button>`;
-  }
+  });
   CL_BAR.innerHTML = html;
   CL_BAR.querySelectorAll('.cl-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (ws) ws.send('select:' + btn.dataset.id);
-    });
+    btn.addEventListener('click', () => { if(ws) ws.send('select:'+btn.dataset.id); });
   });
 }
 
-CONN.addEventListener('click', toggleConnect);
-CMD.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && CMD.value.trim()) {
-    const cmd = CMD.value;
-    log('$ ' + cmd, 'prompt');
-    if (ws) ws.send(cmd);
-    CMD.value = '';
-  }
-});
-
 function toggleConnect() {
-  if (connected) {
-    if (ws) ws.close();
-    return;
-  }
+  if (connected) { if(ws) ws.close(); return; }
   const pw = PW.value.trim();
-  if (!pw) { log('Enter password', 'err'); return; }
-
-  let url = prompt('Render URL (e.g. botrat.onrender.com):', '');
+  if (!pw) { log('enter password', 'err'); return; }
+  let url = prompt('Render URL:', '');
   if (!url) return;
-  url = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-  URL_LABEL.textContent = url;
+  url = url.replace(/^https?:\/\//,'').replace(/\/.*$/,'');
 
   const wsUrl = 'wss://' + url + '/admin/ws';
+  setStatus('connecting...');
 
-  setStatus('Connecting...');
-  log('Connecting to ' + wsUrl + ' ...', 'sys');
+  try { ws = new WebSocket(wsUrl); }
+  catch(e) { log('error: '+e.message, 'err'); setStatus('error','err'); return; }
 
-  try {
-    ws = new WebSocket(wsUrl);
-  } catch(e) {
-    log('Connection error: ' + e.message, 'err');
-    setStatus('Error', 'err');
-    return;
-  }
-
-  ws.onopen = () => {
-    log('Connected, authenticating...', 'sys');
-    ws.send('auth:' + pw);
-  };
-
-  ws.onmessage = (e) => {
-    const data = e.data;
-    const colon = data.indexOf(':');
-
-    if (data === 'auth_ok') {
+  ws.onopen = () => { ws.send('auth:'+pw); };
+  ws.onmessage = e => {
+    const d = e.data;
+    if (d === 'auth_ok') {
       connected = true;
-      setStatus('Connected', 'ok');
-      CONN.textContent = 'Disconnect';
+      setStatus('connected','ok');
+      CONN.textContent = 'disconnect';
+      CONN.className = 'dc';
       INPUT_LINE.classList.remove('hide');
-      CMD.disabled = false;
-      CMD.focus();
+      CMD.disabled = false; CMD.focus();
       PW.disabled = true;
-      log('Authenticated', 'sys');
+      log('λ authenticated', 'sys');
       ws.send('clients');
-      return;
-    }
-
-    if (data === 'auth_err') {
-      log('Auth failed: wrong password', 'err');
-      setStatus('Auth failed', 'err');
+    } else if (d === 'auth_err') {
+      log('✗ wrong password', 'err');
+      setStatus('auth failed','err');
       ws.close();
-      return;
-    }
-
-    if (data.startsWith('clients:')) {
+    } else if (d.startsWith('clients:')) {
       try {
         clients = {};
-        const arr = JSON.parse(data.slice(8));
-        arr.forEach(c => { clients[c.id] = c; });
+        JSON.parse(d.slice(8)).forEach(c => { clients[c.id] = c; });
         renderClients();
-      } catch(e) {}
-      return;
-    }
-
-    if (data.startsWith('selected:')) {
-      const id = data.slice(9);
+      } catch(e){}
+    } else if (d.startsWith('selected:')) {
+      const id = d.slice(9);
       Object.values(clients).forEach(c => c.current = (c.id == id));
       renderClients();
-      log('Selected client ' + id, 'sys');
-      return;
+      log('→ client '+id+' selected', 'sys');
+    } else if (d.startsWith('output:')) {
+      log(d.slice(7));
+    } else if (d.startsWith('error:')) {
+      log(d.slice(6), 'err');
+    } else {
+      log(d);
     }
-
-    if (data.startsWith('output:')) {
-      log(data.slice(7));
-      return;
-    }
-
-    if (data.startsWith('error:')) {
-      log(data.slice(6), 'err');
-      return;
-    }
-
-    log(data);
   };
-
   ws.onclose = () => {
     connected = false;
-    setStatus('Disconnected', 'err');
-    CONN.textContent = 'Connect';
+    setStatus('disconnected','err');
+    CONN.textContent = 'connect';
+    CONN.className = '';
     INPUT_LINE.classList.add('hide');
     CMD.disabled = true;
     PW.disabled = false;
     ws = null;
-    log('Disconnected', 'sys');
   };
-
-  ws.onerror = (e) => {
-    log('WebSocket error', 'err');
-  };
+  ws.onerror = () => { log('✗ websocket error', 'err'); };
 }
+
+CONN.addEventListener('click', toggleConnect);
+CMD.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && CMD.value.trim()) {
+    const cmd = CMD.value;
+    log('▶ '+cmd, 'prompt');
+    if (ws) ws.send(cmd);
+    CMD.value = '';
+  }
+});
 </script>
 </body>
 </html>
